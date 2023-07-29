@@ -9,22 +9,16 @@ import * as dotenv from 'dotenv';
 import cors from 'cors';
 import { Transform } from 'stream';
 
-// const express = require('express');
-// const fetch = require('node-fetch');
-// // const dotenv = require('dotenv')
-// const cors = require('cors');
-// const Transform = require('stream').Transform;
+// import fs from 'fs';
+// import {fsPromise} from 'fs/promises';
+// import path from 'path';
 
 
-
-// Only for testing purposes, do not use in production
-// process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 dotenv.config();
-// console.log(process.env.OPENAI_API_URL);
 
 const app = express();
-const conversation = [];
+import conversation from './model/conversation.js';
 let model = '';
 
 app.use(cors());
@@ -33,9 +27,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // Add express.urlencoded() middleware
 
 app.post('/chat', async (req, res) => {
+
+  console.log(conversation);
+
   try {
     const data = req.body;
-    // console.log(JSON.stringify(data));
+    console.log(JSON.stringify(data));
     conversation.push(...data.conversation);
     model = data.model;
     res.status(200).json({"message":"success"});
