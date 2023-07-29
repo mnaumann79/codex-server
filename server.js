@@ -28,18 +28,18 @@ app.use(express.urlencoded({ extended: true })); // Add express.urlencoded() mid
 
 app.post('/chat', async (req, res) => {
 
-  console.log(conversation);
+  // consol`e.log(conversation);
 
   try {
     const data = req.body;
-    console.log(JSON.stringify(data));
-    conversation.push(...data.conversation);
+    conversation.push({role: 'user', content: data.userMessage});
+    console.log(conversation);
     model = data.model;
     res.status(200).json({"message":"success"});
   } catch (error) {
     console.log(error);
   }
-  console.log(model);
+  // console.log(model);
 });
 
 app.get('/chat', async (req, res) => {
@@ -58,7 +58,7 @@ app.get('/chat', async (req, res) => {
         Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
       },
       body: JSON.stringify({
-        model: model,
+        model: model || 'gpt-4',
         messages: conversation,
         max_tokens: 1000,
         stream: true, //for the streaming purpose
@@ -80,7 +80,8 @@ app.get('/chat', async (req, res) => {
         })}\n\n`
       );
     }
-    console.log()
+    
+    // console.log()
     await new Promise((resolve, reject) => {
       response.body
         .pipe(
@@ -101,6 +102,7 @@ app.get('/chat', async (req, res) => {
                 if (content) {
                   const botResponse = content;
                   assistantContent += botResponse;
+                  conversation.
                   res.write(`data: ${JSON.stringify({ botResponse })}\n\n`);
                 }
               });
