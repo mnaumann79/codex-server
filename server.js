@@ -4,37 +4,24 @@ https://www.youtube.com/watch?v=2FeymQoKvrk&ab_channel=JavaScriptMastery
 */
 
 const express = require('express');
-// const fetch = require('node-fetch');
-const fetch = async () => {
-  try {
-    // Use dynamic import to import the 'node-fetch' module
-    fetch = await import('node-fetch');
-  } catch (err) {
-    console.error('Error importing node-fetch:', err);
-  }
-};
-
+const fetch = require('node-fetch');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const fs = require('fs');
 const { Transform } = require('stream');
 
 const app = express();
+
 const data = {
   conversation: require('./model/conversation.json'),
   setConversation: function (data) {
+    // console.log(data);
     this.conversation = data;
   },
 }; // data object to be passed to the routes
-
 dotenv.config();
 
 let model = '';
-
-const saveConversation = async (conversation) => {
-  // console.log(`The conversation is: ${JSON.stringify(conversation)}`);
-  fs.writeFileSync('./model/conversation.json', conversation);
-};
 
 app.use(cors());
 app.use(express.json());
@@ -47,7 +34,7 @@ app.use(express.urlencoded({ extended: true })); // Add express.urlencoded() mid
 
 app.post('/reset', async (req, res) => {
   try {
-    console.log(data.conversation);
+    // console.log(data.conversation);
     const reqBody = req.body;
     // console.log(reqBody.reset);
     if (reqBody.reset) {
@@ -58,7 +45,7 @@ app.post('/reset', async (req, res) => {
             'The following is a conversation with an AI assistant named Winston. The assistant is helpful, creative, clever, and very friendly. The assistant uses markdown output whenever possible.\n',
         },
       ]);
-      console.log(data.conversation);
+      // console.log(data.conversation);
       // model = data.model;
       res.status(200).json({ message: 'conversation was reset' });
     }
@@ -73,12 +60,15 @@ app.post('/data', async (req, res) => {
     const reqBody = req.body;
     // console.log(reqBody);
     if (data.conversation[data.conversation.length - 1].role !== 'user') {
-      data.setConversation(...data.conversation, {
-        role: 'user',
-        content: reqBody.userMessage,
-      });
+      data.setConversation([
+        ...data.conversation,
+        {
+          role: 'user',
+          content: reqBody.userMessage,
+        },
+      ]);
     }
-    console.log(data.conversation);
+    // console.log(data.conversation);
     model = reqBody.model;
     res
       .status(200)
@@ -90,7 +80,9 @@ app.post('/data', async (req, res) => {
 
 app.get('/history', async (req, res) => {
   try {
-    res.status(200).json({ message: 'success', conversation: conversation });
+    res
+      .status(200)
+      .json({ message: 'success', conversation: data.conversation });
   } catch (error) {
     console.log(error);
   }
@@ -113,14 +105,18 @@ app.get('/answer', async (req, res) => {
       },
       body: JSON.stringify({
         model: model || 'gpt-4',
-        messages: conversation,
+        messages: data.conversation,
         max_tokens: 1000,
         stream: true, //for the streaming purpose
       }),
     });
 
     // let assistantContent = "";
-    conversation.push({ role: 'assistant', content: '' });
+    // conversation.push({ role: 'assistant', content: '' });
+    data.setConversation([
+      ...data.conversation,
+      { role: 'assistant', content: '' },
+    ]);
 
     try {
       if (!response.ok) {
@@ -154,10 +150,13 @@ app.get('/answer', async (req, res) => {
                 const { delta } = choices[0];
                 const { content } = delta;
                 if (content) {
-                  const botResponse = content;
+                  // const botResponse = content;
+                  const conversation = data.conversation;
                   // assistantContent += botResponse;
-                  conversation[conversation.length - 1].content += botResponse;
-                  res.write(`data: ${JSON.stringify({ conversation })}\n\n`);
+
+                  conversation[conversation.length - 1].content += content;
+                  data.setConversation(conversation);
+                  res.write(`data: ${JSON.stringify(data.conversation)}\n\n`);
                 }
               });
               callback();
@@ -168,7 +167,7 @@ app.get('/answer', async (req, res) => {
           // Consume the data to trigger the 'end' event
         })
         .on('end', () => {
-          saveConversation(JSON.stringify(conversation));
+          // saveConversation(JSON.stringify(conversation));
           res.end();
           resolve();
         })
