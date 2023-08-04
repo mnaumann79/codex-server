@@ -1,32 +1,55 @@
-const fspromise = require('fs').promises;
-const path = require('path');
-const fetch = require('node-fetch');
-const { Transform } = require('stream');
+// const fspromise = require('fs').promises;
+// const path = require('path');
+// const fetch = require('node-fetch');
+// const { Transform } = require('stream');
+
+import fspromise from 'fs/promises';
+import fs from 'fs';
+import path from 'path';
+import fetch from 'node-fetch';
+import { Transform } from 'stream';
+
+import { writeFile } from 'fs/promises';
+import { fileURLToPath } from 'url';
+import { dirname, resolve } from 'path';
+
+import conversation from '../model/conversation.js';
 
 const data = {
-  conversation: require('../model/conversation.json'),
+  conversation: conversation,
   setConversation: function (data) {
     // console.log(data);
     this.conversation = data;
   },
-  model: '',
+  model: 'gpt-4',
   setModel: function (data) {
     // console.log(data);
     this.model = data;
   },
 }; // data object to be passed to the routes
 
-const saveConversation = async (data) => {
-  fspromise.writeFile(
-    path.join(__dirname, '..', 'model', 'conversation.json'),
-    JSON.stringify(data)
+// const saveConversation = async (data) => {
+//   fspromise.writeFile(
+//     path.join(__dirname, '..', 'model', 'conversation.js'),
+//     `const conversation = ${data};\nexport default conversation;`
+//   );
+// };
+
+const saveConversation = (data) => {
+  fs.writeFileSync(
+    './model/conversation.js',
+    `const conversation = ${JSON.stringify(
+      data
+    )};\nexport default conversation;`
   );
 };
 
+// console.log(data.conversation);
+
 const resetChat = (req, res) => {
-  // console.log(data.conversation);
+  console.log(data.conversation);
   const reqBody = req.body;
-  // console.log(reqBody.reset);
+  console.log(reqBody.reset);
   if (reqBody.reset) {
     data.setConversation([
       {
@@ -35,10 +58,9 @@ const resetChat = (req, res) => {
           'The following is a conversation with an AI assistant named Winston. The assistant is helpful, creative, clever, and very friendly. The assistant uses markdown output whenever possible.\n',
       },
     ]);
-    saveConversation(data.conversation);
 
-    // console.log(data.conversation);
-    // model = data.model;
+    console.log(data.conversation, data.model);
+    saveConversation(data.conversation);
     res.status(200).json({ message: 'conversation was reset' });
   }
 };
@@ -58,7 +80,7 @@ const setUserMessage = (req, res) => {
   }
 
   data.setModel(reqBody.model);
-  
+
   res.status(200).json({
     message: 'success',
     conversation: data.conversation,
@@ -129,13 +151,17 @@ const getAnswer = async (req, res) => {
               const { delta } = choices[0];
               const { content } = delta;
               if (content) {
-                // const botResponse = content;
                 const conversation = data.conversation;
                 // assistantContent += botResponse;
 
                 conversation[conversation.length - 1].content += content;
                 data.setConversation(conversation);
-                res.write(`data: ${JSON.stringify(data.conversation)}\n\n`);
+                res.write(
+                  `data: ${JSON.stringify(
+                    conversation[conversation.length - 1].content
+                  )}\n\n`
+                );
+                // res.write(`data: ${botResponse}\n\n`);
               }
             });
             callback();
@@ -159,4 +185,4 @@ const getAnswer = async (req, res) => {
   });
 };
 
-module.exports = { resetChat, setUserMessage, getHistory, getAnswer };
+export { resetChat, setUserMessage, getHistory, getAnswer };

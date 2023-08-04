@@ -1,10 +1,20 @@
-const express = require('express');
+// const express = require('express');
+// const router = express.Router();
+// const chatController = require('../../controllers/chatController');
+
+import express from 'express';
+
+import { resetChat, setUserMessage, getHistory, getAnswer } from '../../controllers/chatController.js';
+
 const router = express.Router();
-const chatController = require('../../controllers/chatController');
 
-router.route('/reset').post(chatController.resetChat);
-router.route('/usermessage').post(chatController.setUserMessage);
-router.route('/history').get(chatController.getHistory);
-router.route('/answer').get(chatController.getAnswer);
+router.route('/reset').post(resetChat);
+// router.route('/reset').post();
 
-module.exports = router;
+router.route('/usermessage').post(setUserMessage);
+
+router.route('/history').get(getHistory);
+
+router.route('/answer').get(getAnswer);
+
+export default router;

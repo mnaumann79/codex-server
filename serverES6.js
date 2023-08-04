@@ -20,7 +20,7 @@ const app = express();
 import conversation from "./model/conversation.js";
 let model = "";
 
-const saveConversation = async (conversation) => {
+const saveConversation = (conversation) => {
   // console.log(`The conversation is: ${JSON.stringify(conversation)}`);
   fs.writeFileSync(
     "./model/conversation.js",
