@@ -8,6 +8,7 @@ const fetch = require('node-fetch');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const fs = require('fs');
+const path = require('path');
 const { Transform } = require('stream');
 
 const app = express();
@@ -19,6 +20,13 @@ const data = {
     this.conversation = data;
   },
 }; // data object to be passed to the routes
+
+const saveConversation = (data) => {
+  fs.writeFileSync(
+    path.join(__dirname, '.', 'model', 'conversation.json'),
+    JSON.stringify(data)
+  );
+};
 dotenv.config();
 
 let model = '';
@@ -32,27 +40,31 @@ app.use(express.json());
 
 app.use(express.urlencoded({ extended: true })); // Add express.urlencoded() middleware
 
-app.post('/reset', async (req, res) => {
-  try {
-    // console.log(data.conversation);
-    const reqBody = req.body;
-    // console.log(reqBody.reset);
-    if (reqBody.reset) {
-      data.setConversation([
-        {
-          role: 'system',
-          content:
-            'The following is a conversation with an AI assistant named Winston. The assistant is helpful, creative, clever, and very friendly. The assistant uses markdown output whenever possible.\n',
-        },
-      ]);
-      // console.log(data.conversation);
-      // model = data.model;
-      res.status(200).json({ message: 'conversation was reset' });
-    }
-  } catch (error) {
-    console.log(error);
-  }
-});
+app.use('/', require('./routes/api/chat'))
+
+// app.post('/reset', async (req, res) => {
+//   try {
+//     // console.log(data.conversation);
+//     const reqBody = req.body;
+//     // console.log(reqBody.reset);
+//     if (reqBody.reset) {
+//       data.setConversation([
+//         {
+//           role: 'system',
+//           content:
+//             'The following is a conversation with an AI assistant named Winston. The assistant is helpful, creative, clever, and very friendly. The assistant uses markdown output whenever possible.\n',
+//         },
+//       ]);
+//       saveConversation(data.conversation);
+
+//       // console.log(data.conversation);
+//       // model = data.model;
+//       res.status(200).json({ message: 'conversation was reset' });
+//     }
+//   } catch (error) {
+//     console.log(error);
+//   }
+// });
 
 app.post('/data', async (req, res) => {
   // console.log(conversation);
@@ -67,12 +79,14 @@ app.post('/data', async (req, res) => {
           content: reqBody.userMessage,
         },
       ]);
+      saveConversation(data.conversation);
     }
     // console.log(data.conversation);
     model = reqBody.model;
-    res
-      .status(200)
-      .json({ message: 'success', conversation: data.conversation });
+    res.status(200).json({
+      message: 'success',
+      conversation: data.conversation,
+    });
   } catch (error) {
     console.log(`here is the error: ${error}`);
   }
@@ -80,9 +94,10 @@ app.post('/data', async (req, res) => {
 
 app.get('/history', async (req, res) => {
   try {
-    res
-      .status(200)
-      .json({ message: 'success', conversation: data.conversation });
+    res.status(200).json({
+      message: 'success',
+      conversation: data.conversation,
+    });
   } catch (error) {
     console.log(error);
   }
@@ -111,8 +126,6 @@ app.get('/answer', async (req, res) => {
       }),
     });
 
-    // let assistantContent = "";
-    // conversation.push({ role: 'assistant', content: '' });
     data.setConversation([
       ...data.conversation,
       { role: 'assistant', content: '' },
@@ -167,6 +180,8 @@ app.get('/answer', async (req, res) => {
           // Consume the data to trigger the 'end' event
         })
         .on('end', () => {
+          saveConversation(data.conversation);
+
           // saveConversation(JSON.stringify(conversation));
           res.end();
           resolve();
