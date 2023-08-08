@@ -47,9 +47,9 @@ const saveConversation = (data) => {
 // console.log(data.conversation);
 
 const resetChat = (req, res) => {
-  console.log(data.conversation);
+  // console.log(data.conversation);
   const reqBody = req.body;
-  console.log(reqBody.reset);
+  // console.log(reqBody.reset);
   if (reqBody.reset) {
     data.setConversation([
       {
@@ -59,7 +59,7 @@ const resetChat = (req, res) => {
       },
     ]);
 
-    console.log(data.conversation, data.model);
+    // console.log(data.conversation, data.model);
     saveConversation(data.conversation);
     res.status(200).json({ message: 'conversation was reset' });
   }
@@ -156,12 +156,12 @@ const getAnswer = async (req, res) => {
 
                 conversation[conversation.length - 1].content += content;
                 data.setConversation(conversation);
-                res.write(
-                  `data: ${JSON.stringify(
-                    conversation[conversation.length - 1].content
-                  )}\n\n`
-                );
-                // res.write(`data: ${botResponse}\n\n`);
+                // res.write(
+                //   `data: ${JSON.stringify(
+                //     conversation[conversation.length - 1].content
+                //   )}\n\n`
+                // );
+                res.write(`data: ${content}\n\n`);
               }
             });
             callback();
