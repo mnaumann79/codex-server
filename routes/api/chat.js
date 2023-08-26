@@ -4,7 +4,7 @@
 
 import express from 'express';
 
-import { resetChat, setUserMessage, getHistory, getAnswer } from '../../controllers/chatController.js';
+import { resetChat, setUserMessage, getHistory, getAnswer, getAnswerAI } from '../../controllers/chatController.js';
 
 const router = express.Router();
 
@@ -16,5 +16,7 @@ router.route('/usermessage').post(setUserMessage);
 router.route('/history').get(getHistory);
 
 router.route('/answer').get(getAnswer);
+
+router.route('/answer-ai').get(getAnswerAI);
 
 export default router;
