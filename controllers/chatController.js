@@ -35,7 +35,7 @@ const resetChat = (req, res) => {
 		{
 			role: "system",
 			content:
-				"The following is a conversation with an AI assistant named Winston. The assistant is helpful, creative, clever, and very friendly. The assistant uses markdown output whenever possible.\n"
+				"The following is a conversation with an AI assistant named Winston. The assistant is helpful, creative, clever, and very friendly. The assistant uses markdown output whenever possible. Keep your answers within 100 words.\n"
 		}
 	]);
 	res.status(200).json({ message: "conversation was reset", conversation: data.conversation });
@@ -84,7 +84,7 @@ const getAnswerAI = async (req, res) => {
 		const response = await openai.chat.completions.create({
 			model: data.model,
 			messages: data.conversation,
-			max_tokens: 100,
+			max_tokens: 250,
 			stream: true
 		});
 

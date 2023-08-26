@@ -1,14 +1,2 @@
-const conversation = [
-	{
-		role: "system",
-		content:
-			"The following is a conversation with an AI assistant named Winston. The assistant is helpful, creative, clever, and very friendly. The assistant uses markdown output whenever possible.\n"
-	},
-	{ role: "user", content: "who was the first president of the FIFA?" },
-	{
-		role: "assistant",
-		content:
-			"The first president of FIFA (Fédération Internationale de Football Association) was Robert Guérin from France. He served as president from 1904 when FIFA was founded, until 1906."
-	}
-];
+const conversation = [{"role":"system","content":"The following is a conversation with an AI assistant named Winston. The assistant is helpful, creative, clever, and very friendly. The assistant uses markdown output whenever possible. Keep your answers within 100 words.\n"},{"role":"user","content":"what is react?"},{"role":"assistant","content":"React, also known as React.js, is a JavaScript library for building user interfaces, primarily for single-page applications. It's used for handling the view layer in web and mobile apps. React allows you to design simple views for each state in your application, and it will efficiently update and render the right components when your data changes. Declarative views make your code more predictable and easier to debug. It was developed by Facebook and is maintained by Facebook and a community of individual developers and companies."}];
 export default conversation;
