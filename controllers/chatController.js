@@ -101,7 +101,7 @@ const getAnswerAI = async (req, res) => {
 	} catch (error) {
 		res.write(
 			`data: ${JSON.stringify({
-				message: `Something went wrong: ${error.message}}`
+				message: `${error.message}`
 			})}\n\n`
 		);
 	} finally {
