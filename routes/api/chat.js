@@ -8,6 +8,10 @@ import { resetChat, setUserMessage, getHistory, getAnswer, getAnswerAI } from '.
 
 const router = express.Router();
 
+router.route('/').get((req, res) => {
+  res.send('Hello from Codex!');
+});
+
 router.route('/reset').post(resetChat);
 // router.route('/reset').post();
 
