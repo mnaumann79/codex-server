@@ -30,14 +30,17 @@ const data = {
 
 const resetChat = (req, res) => {
 	const reqBody = req.body;
-	// console.log(reqBody.reset);
-	data.setConversation([
-		{
-			role: "system",
-			content:
-				"The following is a conversation with an AI assistant named Winston. The assistant is helpful, creative, clever, and very friendly. The assistant uses markdown output whenever possible. Keep your answers within 100 words.\n"
-		}
-	]);
+	// console.log(reqBody.conversation);
+	data.setConversation(
+		reqBody.conversation
+		// [
+		// 	{
+		// 		role: "system",
+		// 		content:
+		// 			"The following is a conversation with an AI assistant named Winston. The assistant is helpful, creative, clever, and very friendly. The assistant uses markdown output whenever possible. Keep your answers within 100 words.\n"
+		// 	}
+		// ]
+	);
 	res.status(200).json({ message: "conversation was reset", conversation: data.conversation });
 };
 
