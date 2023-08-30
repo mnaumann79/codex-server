@@ -7,15 +7,13 @@ https://www.youtube.com/watch?v=2FeymQoKvrk&ab_channel=JavaScriptMastery
 // const dotenv = require('dotenv');
 // const cors = require('cors');
 
-import express from 'express';
+import express from "express";
 
-import cors from 'cors';
+import cors from "cors";
 
-import router from './routes/api/chat.js';
-import conversation from './model/conversation.js';
+import router from "./routes/api/chat.js";
 
 const app = express();
-
 
 app.use(cors());
 app.use(express.json());
@@ -26,8 +24,10 @@ app.use(express.json());
 
 app.use(express.urlencoded({ extended: true })); // Add express.urlencoded() middleware
 
+app.use(express.static("dist"));
+
 //routes
-app.use('/', router);
+app.use("/api", router);
 
 // app.post('/reset', async (req, res) => {
 //   console.log(conversation);
@@ -52,5 +52,5 @@ app.use('/', router);
 // });
 
 app.listen(process.env.PORT, () => {
-  console.log(`Server is listening at port ${process.env.PORT}`);
+	console.log(`Server is listening at port ${process.env.PORT}`);
 });

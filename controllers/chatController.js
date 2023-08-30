@@ -116,6 +116,14 @@ const getAnswerAI = async (req, res) => {
 
 const getAnswer = async (req, res) => {
 	// make the request to the OpenAI API
+	res.writeHead(200, {
+		"Content-Type": "text/event-stream",
+		"Cache-Control": "no-cache",
+		Connection: "keep-alive"
+	});
+
+	let assistantContent = "";
+
 	const response = await fetch(process.env.OPENAI_API_URL, {
 		method: "POST",
 		headers: {
@@ -123,19 +131,13 @@ const getAnswer = async (req, res) => {
 			Authorization: `Bearer ${process.env.OPENAI_API_KEY}`
 		},
 		body: JSON.stringify({
-			// model: data.model,
-			model: "gpt-4",
-			messages:
-				// messages: data.conversation,
-				[
-					{ role: "system", content: "You are a helpful and smart personal assitant" },
-					{ role: "user", content: "count to 10" }
-				],
-			max_tokens: 1000,
+			model: data.model,
+			messages: data.conversation,
+			max_tokens: 250,
 			stream: true //for the streaming purpose
 		})
 	});
-	console.log(response.ok);
+	// console.log(response.ok);
 
 	if (!response.ok) {
 		res.write(
@@ -146,13 +148,7 @@ const getAnswer = async (req, res) => {
 		return;
 	}
 
-	res.writeHead(200, {
-		"Content-Type": "text/event-stream",
-		"Cache-Control": "no-cache",
-		Connection: "keep-alive"
-	});
-
-	data.setConversation([...data.conversation, { role: "assistant", content: "" }]);
+	// data.setConversation([...data.conversation, { role: "assistant", content: "" }]);
 
 	await new Promise((resolve, reject) => {
 		response.body
@@ -162,21 +158,22 @@ const getAnswer = async (req, res) => {
 						const lines = chunk.toString().split("\n");
 						// console.log(lines);
 						const parsedLines = lines
-							.map((line) => line.replace(/^data: /, "").trim()) // Remove the "data: " prefix
-							.filter((line) => line !== "") // Remove empty lines and "[DONE]"
-							.filter((line) => line !== "[DONE]") // Remove empty lines and "[DONE]"
-							.map((line) => JSON.parse(line)); // Parse the JSON string
+							.map(line => line.replace(/^data: /, "").trim()) // Remove the "data: " prefix
+							.filter(line => line !== "") // Remove empty lines and "[DONE]"
+							.filter(line => line !== "[DONE]") // Remove empty lines and "[DONE]"
+							.map(line => JSON.parse(line)); // Parse the JSON string
 						// console.log(parsedLines);
-						parsedLines.forEach((parsedLine) => {
+						parsedLines.forEach(parsedLine => {
 							const { choices } = parsedLine;
 							const { delta } = choices[0];
 							const { content } = delta;
 							if (content) {
 								// console.log(content);
-								const conversation = data.conversation;
-								conversation[conversation.length - 1].content += content;
-								data.setConversation(conversation);
+								// const conversation = data.conversation;
+								// conversation[conversation.length - 1].content += content;
 								res.write(`data: ${content}\n\n`);
+								assistantContent += content;
+								// data.setConversation(conversation);
 							}
 						});
 						callback();
@@ -187,7 +184,11 @@ const getAnswer = async (req, res) => {
 				// Consume the data to trigger the 'end' event
 			})
 			.on("end", () => {
-				saveConversation(data.conversation);
+				const conversation = [
+					...data.conversation,
+					{ role: "assistant", content: assistantContent }
+				];
+				data.setConversation(conversation);
 				res.end();
 				resolve();
 			})
