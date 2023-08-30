@@ -23,9 +23,9 @@ app.use(express.static("dist"));
 //routes
 app.use("/chat", router);
 
-app.get("/", (req, res) => {
-	res.send("Hello from Codex-Server!");
-});
+// app.get("/", (req, res) => {
+// 	res.send("Hello from Codex-Server!");
+// });
 
 
 
