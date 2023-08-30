@@ -16,10 +16,10 @@ const data = {
 	setConversation: function (data) {
 		// console.log(data);
 		this.conversation = data;
-		fs.writeFileSync(
-			"./model/conversation.js",
-			`const conversation = ${JSON.stringify(data)};\nexport default conversation;`
-		);
+		// fs.writeFileSync(
+		// 	"./model/conversation.js",
+		// 	`const conversation = ${JSON.stringify(data)};\nexport default conversation;`
+		// );
 	},
 	model: "gpt-4",
 	setModel: function (data) {
