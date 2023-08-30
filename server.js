@@ -18,10 +18,15 @@ app.use(express.json());
 
 app.use(express.urlencoded({ extended: true })); // Add express.urlencoded() middleware
 
-// app.use(express.static("dist"));
+app.use(express.static("dist"));
 
 //routes
-app.use("/", router);
+app.use("/chat", router);
+
+app.get("/", (req, res) => {
+	res.send("Hello from Codex-Server!");
+});
+
 
 
 app.listen(process.env.PORT, () => {
