@@ -1,7 +1,3 @@
-// const express = require('express');
-// const router = express.Router();
-// const chatController = require('../../controllers/chatController');
-
 import express from "express";
 
 import {
@@ -14,9 +10,9 @@ import {
 
 const router = express.Router();
 
-router.route("/").get((req, res) => {
-	res.send("Hello from Codex-Server!");
-});
+// router.route("/").get((req, res) => {
+// 	res.send("Hello from Codex-Server!");
+// });
 
 router.route("/reset").post(resetChat);
 

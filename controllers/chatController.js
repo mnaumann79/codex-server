@@ -73,24 +73,24 @@ const getHistory = (req, res) => {
 };
 
 const getAnswerAI = async (req, res) => {
-	// console.log("we're here");
-
+	
 	res.writeHead(200, {
 		"Content-Type": "text/event-stream",
 		"Cache-Control": "no-cache",
 		Connection: "keep-alive"
 	});
-
+	
 	let assistantContent = "";
-
+	
 	try {
+		console.log(data.conversation);
 		const response = await openai.chat.completions.create({
 			model: data.model,
 			messages: data.conversation,
 			max_tokens: 250,
 			stream: true
 		});
-
+		
 		for await (const chunk of response) {
 			const { choices } = chunk;
 			const { delta } = choices[0];
@@ -102,6 +102,7 @@ const getAnswerAI = async (req, res) => {
 			}
 		}
 	} catch (error) {
+		console.log(error)
 		res.write(
 			`data: ${JSON.stringify({
 				message: `${error.message}`
