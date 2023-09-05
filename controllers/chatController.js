@@ -1,9 +1,11 @@
-import fetch from "node-fetch";
-import { Transform } from "stream";
-import OpenAI from "openai";
-import conversation from "../model/conversation.js";
-import dotenv from "dotenv";
+// import fetch from "node-fetch";
+// import { Transform } from "stream";
 
+import OpenAI from "openai";
+import conversation from "../model/conversation2.js";
+import dotenv from "dotenv";
+// import mongoose from "mongoose";
+import Message from "../model/Message.js";
 dotenv.config();
 
 const openai = new OpenAI({
@@ -11,7 +13,7 @@ const openai = new OpenAI({
 });
 
 const data = {
-	conversation: conversation,
+	conversation: await Message.find(),
 	setConversation: function (data) {
 		this.conversation = data;
 	},
@@ -180,5 +182,4 @@ const getAnswer = async (req, res) => {
 			});
 	});
 };
-
-export { resetChat, setUserMessage, getHistory, getAnswer, getAnswerAI };
+export { resetChat, setUserMessage, getHistory, getAnswerAI };

@@ -7,3 +7,4 @@ const conversation = [
 	{ role: "user", content: "what is react?" }
 ];
 export default conversation;
+// module.exports = conversation;
