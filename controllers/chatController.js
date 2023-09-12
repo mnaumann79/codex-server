@@ -5,7 +5,7 @@ import OpenAI from "openai";
 import conversation from "../model/conversation2.js";
 import dotenv from "dotenv";
 // import mongoose from "mongoose";
-import Message from "../model/Message.js";
+// import Message from "../model/Message.js";
 dotenv.config();
 
 const openai = new OpenAI({
@@ -13,7 +13,8 @@ const openai = new OpenAI({
 });
 
 const data = {
-	conversation: await Message.find(),
+	conversation: conversation,
+	// conversation: await Message.find(),
 	setConversation: function (data) {
 		this.conversation = data;
 	},
